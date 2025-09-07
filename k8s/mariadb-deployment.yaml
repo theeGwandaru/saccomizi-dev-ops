@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: saccomizi-mariadb
+  labels:
+    app: saccomizi-mariadb
+spec:
+  type: NodePort
+  ports:
+    - port: 3306
+      nodePort: 30306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: saccomizi-mariadb
+    tier: mariadb
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pv-claim
+  labels:
+    app: saccomizi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+     storage: 10Gi
+---    
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-init-scripts
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS saccomizi;
+    CREATE USER 'saccomiziapp'@'localhost' IDENTIFIED BY 'password';
+    GRANT ALL PRIVILEGES ON saccomizi.* TO 'saccomiziapp'@'%';
+    FLUSH PRIVILEGES;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: mariadb-config
+data:
+    mariadb.cnf: |
+        [madiadbd]
+        pid-file                = /run/mysqld/mysqld.pid
+        basedir                 = /usr
+        bind-address=0.0.0.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saccomizi-mariadb
+  labels:
+    app: saccomizi
+spec:
+  selector:
+    matchLabels:
+      app: saccomizi-mariadb
+      tier: mariadb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: saccomizi-mariadb
+        tier: mariadb
+    spec:
+      containers:
+      - image: mariadb:latest
+        name: mariadb
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-pass
+              key: password
+        - name: MARIADB_DATABASE
+          value: saccomizi
+        - name: MARIADB_USER
+          value: saccomiziapp
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mariadb-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mariadb
+        volumeMounts:
+        - name: mariadb-persistent-storage
+          mountPath: /var/lib/mariadb
+        - name: config-volume
+          mountPath: /etc/mysql/mariadb.conf.d/50-server.cnf
+          subPath: mariadb.cnf
+        - name: initdb-scripts
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: mariadb-persistent-storage
+        persistentVolumeClaim:
+          claimName: mariadb-pv-claim
+      - name: initdb-scripts
+        configMap:
+          name: mariadb-init-scripts
+      - name: config-volume
+        configMap:
+          name: mariadb-config

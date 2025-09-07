@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mariadb:latest
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+      MARIADB_USER: saccomiziapp
+      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: saccomizi
+    ports:
+     - 3307:3306
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-usaccomiziapp", -ppassword]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  user-service:
+    image: saccomizi/user-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/saccomizi
+      - SPRING_DATASOURCE_USERNAME=saccomiziapp
+      - SPRING_DATASOURCE_PASSWORD=password
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
