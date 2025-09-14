@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-service
+  labels:
+    app: notification-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      nodePort: 30081
+      targetPort: 8080
+  selector:
+    app: notification-service
+    tier: saccomizi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  labels:
+    app: notification-service
+spec:
+  selector:
+    matchLabels: 
+      app: notification-service
+      tier: saccomizi
+  template:
+    metadata:
+      labels:
+        app: notification-service
+        tier: saccomizi
+    spec:
+      containers:
+        - image: saccomizi/notification-service:latest
+          name: notification-service
+          imagePullPolicy: Never
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mariadb://saccomizi-mariadb:3306/saccomizi
+            - name: SPRING_DATASOURCE_USERNAME
+              value: saccomiziapp
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: saccomizi-cluster-kafka-bootstrap:9092
+            - name: SPRING_KAFKA_CONSUMER_GROUP
+              value: saccomizi
+            - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
+              value: org.springframework.kafka.support.serializer.JsonSerializer
+            - name: SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER
+              value: org.apache.kafka.common.serialization.ByteArrayDeserializer
