@@ -1,4 +1,15 @@
 services:
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka_broker
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+
   db:
     image: mariadb:latest
     restart: always
@@ -26,6 +37,40 @@ services:
       - SPRING_DATASOURCE_PASSWORD=password
     ports:
       - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  account-management-service:
+    image: saccomizi/account-management-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/saccomizi
+      - SPRING_DATASOURCE_USERNAME=saccomiziapp
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_CONSUMER_GROUP=saccomizi
+      - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonSerializer
+      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.apache.kafka.common.serialization.ByteArrayDeserializer
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  notification-service:
+    image: saccomizi/notification-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/saccomizi
+      - SPRING_DATASOURCE_USERNAME=saccomiziapp
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_CONSUMER_GROUP=saccomizi
+      - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonSerializer
+      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.apache.kafka.common.serialization.ByteArrayDeserializer
+    ports:
+      - "8082:8080"
     depends_on:
       db:
         condition: service_healthy
