@@ -3,5 +3,8 @@ secretGenerator:
   literals:
   - password=password
 resources:
+  - kafka-deployment.yaml
   - mariadb-deployment.yaml
   - user-service-deployment.yaml
+  - account-management-service-deployment.yaml
+  - notification-service-deployment.yaml
