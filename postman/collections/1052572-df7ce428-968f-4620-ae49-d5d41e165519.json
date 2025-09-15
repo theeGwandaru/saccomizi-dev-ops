@@ -24,16 +24,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://192.168.49.2:30080/users",
+					"raw": "http://saccomizi.com/user-service/users",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"49",
-						"2"
+						"saccomizi",
+						"com"
 					],
-					"port": "30080",
 					"path": [
+						"user-service",
 						"users"
 					]
 				}
