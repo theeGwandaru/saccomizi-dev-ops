@@ -62,16 +62,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://192.168.49.2:30081/deposits",
+					"raw": "http://saccomizi.com/account-management-service/deposits",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"49",
-						"2"
+						"saccomizi",
+						"com"
 					],
-					"port": "30081",
 					"path": [
+						"account-management-service",
 						"deposits"
 					]
 				}
