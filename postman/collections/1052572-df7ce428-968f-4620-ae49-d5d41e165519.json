@@ -1,0 +1,82 @@
+{
+	"info": {
+		"_postman_id": "1052572-df7ce428-968f-4620-ae49-d5d41e165519",
+		"name": "saccomizi-k8s",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://192.168.49.2:30080/users",
+			"id": "1052572-9ea41db1-9181-4e8d-8f29-ae62b11143ba",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"surname\": \"James\",\n    \"firstName\":\"Mbugua\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.49.2:30080/users",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"49",
+						"2"
+					],
+					"port": "30080",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://192.168.49.2:30081/deposits",
+			"id": "1052572-1f30640a-dff9-45da-aa41-b47402ce5e27",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"memberId\": 3,\n    \"accountNumber\": \"12345\",\n    \"transactionType\": \"deposit\",\n    \"amount\": 5000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://192.168.49.2:30081/deposits",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"49",
+						"2"
+					],
+					"port": "30081",
+					"path": [
+						"deposits"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
