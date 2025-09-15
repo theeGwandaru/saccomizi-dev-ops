@@ -5,10 +5,9 @@ metadata:
   labels:
     app: account-management-service
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 8080
-      nodePort: 30081
       targetPort: 8080
   selector:
     app: account-management-service

@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: saccomizi-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: saccomizi.com
+      http:
+        paths:
+          - path: /user-service(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: saccomizi-user-service
+                port:
+                  number: 8080
+          - path: /account-management-service(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: account-management-service
+                port:
+                  number: 8080
+          - path: /notification-service(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: saccomizi-notification-service
+                port:
+                  number: 8080

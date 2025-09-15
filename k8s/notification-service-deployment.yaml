@@ -1,14 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: notification-service
+  name: saccomizi-notification-service
   labels:
-    app: notification-service
+    app: saccomizi-notification-service
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 8080
-      nodePort: 30081
       targetPort: 8080
   selector:
     app: notification-service
@@ -18,23 +17,23 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notification-service
+  name: saccomizi-notification-service
   labels:
-    app: notification-service
+    app: saccomizi-notification-service
 spec:
   selector:
     matchLabels: 
-      app: notification-service
+      app: saccomizi-notification-service
       tier: saccomizi
   template:
     metadata:
       labels:
-        app: notification-service
+        app: saccomizi-notification-service
         tier: saccomizi
     spec:
       containers:
         - image: saccomizi/notification-service:latest
-          name: notification-service
+          name: saccomizi-notification-service
           imagePullPolicy: Never
           env:
             - name: SPRING_DATASOURCE_URL
